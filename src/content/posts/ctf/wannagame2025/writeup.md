@@ -10,7 +10,7 @@ lang: ''
 ---
 
 
-Some CTF challenges that I solved in and after the comp.
+Some CTF challenges that I solved during and after the competition.
 
 
 
@@ -22,19 +22,19 @@ Some CTF challenges that I solved in and after the comp.
 
 ![Challenge](./image/challenge.png)
 
-This challenge was pretty tough but also really interesting for me to do. I finally got it when the comp ended.
+This challenge was pretty tough but also really interesting for me to do. I finally got it after the comp ended.
 
-First, I join the server to figure out what happen in there.
+First, I joined the server to figure out what was happening in there.
 ![](./image/thehub.png)
 
 There is a Discord bot called `GateKeeper` in the server. The author gave a hint about some kind of `invisible-cloak`, which I’ll mention later. You can interact with `GateKeeper` using Discord commands with the prefix `!`. 
 
-I tried messing around with it in the server for a while, but nothing really happened. Then I start doing private chat with the bot, and that's when things started to get strange. There are some commands available here, the most importand commands are `!set` and `!talk`. At first, the `!talk` command trigger the bot to start yapping a lot with meaningless sentences, `!set` set some password for the encryption of something.
+I tried messing around with it in the server for a while, but nothing really happened. Then I started doing private chat with the bot, and that's when things started to get strange. There are some commands available here, the most important commands are `!set` and `!talk`. At first, the `!talk` command triggers the bot to start yapping a lot with meaningless sentences, `!set` sets some password for the encryption of something.
 
 ![](./image/thebot.png)
 
 
-I stuck at those commands for a few hours, clueless of what to do and try to figure out what the bot trying to convey. I tried to find the connection between those commands, I tested a few differents password for the `!set` before run `!talk`, but nothing special actually happend, the bot keep yapping as usual. 
+I was stuck on those commands for a few hours, clueless about what to do and trying to figure out what the bot was trying to convey. I tried to find the connection between those commands, I tested a few different passwords for the `!set` before running `!talk`, but nothing special actually happened, the bot kept yapping as usual. 
 
 
 Back to the hint, I figured it had something to do with *invisibility* — probably some kind of text steganography. After a bit of Googling, I realized it was StegCloak, which also ties perfectly with the Harry Potter GIF hint about the invisible cloak. StegCloak hides data inside some invisible unicode characters, making the message completely invisible in plain text. Once I knew that, everything started to make sense, and I could finally extract the hidden text inside the bot’s responses. 
@@ -65,7 +65,7 @@ Part 2 is about image stegnography using Linked List Pixels technique(hint), som
 ![](./image/part2.png)
 
 
-After a quick Googling on this stego method, I found that the idea is to hide data by linking specific pixels together instead of storing everything sequentially. Each “linked” pixel points to the next one using its color values or coordinates, and by following that chain, you can recover the hidden message. And the key of this techniques is to identify the start coordination before recover. Checking the metadata of this image, I found this:
+After a quick Googling on this stego method, I found that the idea is to hide data by linking specific pixels together instead of storing everything sequentially. Each "linked" pixel points to the next one using its color values or coordinates, and by following that chain, you can recover the hidden message. And the key to this technique is to identify the start coordinates before recovery. Checking the metadata of this image, I found this:
 
 ![](./image/coordination.png)
 
@@ -108,7 +108,7 @@ plain = cipher.decrypt(data)
 print(plain)
 ```
 
-That's all, the second part of the flag finally show up:
+That's all, the second part of the flag finally showed up:
 
 ![](./image/flag.png)
 
@@ -120,3 +120,4 @@ This is my first time writing a blog, so feel free to DM me if you have any ques
 
 Thank you for reading, and see you in the next writeup!
 
+Peace <3
