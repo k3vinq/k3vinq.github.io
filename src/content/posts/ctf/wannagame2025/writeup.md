@@ -65,7 +65,13 @@ Part 2 is about image stegnography using Linked List Pixels technique(hint), som
 ![](./image/part2.png)
 
 
-After a quick Googling on this stego method, I found that the idea is to hide data by linking specific pixels together instead of storing everything sequentially. Each "linked" pixel points to the next one using its color values or coordinates, and by following that chain, you can recover the hidden message. And the key to this technique is to identify the start coordinates before recovery. Checking the metadata of this image, I found this:
+After a quick Googling on this stego method, I found that the idea is to hide data by linking specific pixels together instead of storing everything sequentially. Each "linked" pixel points to the next one using its color values or coordinates, and by following that chain, you can recover the hidden message. And the key to this technique is to identify the start coordinates before recovery the image. 
+
+![](./image/LPS_schema.png)
+
+
+
+Checking the metadata of this image, I found this:
 
 ![](./image/coordination.png)
 
