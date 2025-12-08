@@ -72,6 +72,11 @@ export const profileConfig: ProfileConfig = {
 			icon: "fa6-brands:facebook",
 			url: "https://www.facebook.com/211qkho1/",
 		},
+		{
+			name: "HackerOne",
+			icon: "simple-icons:hackerone",
+			url: "https://hackerone.com/k3vinq",
+		},
 	],
 };
 
