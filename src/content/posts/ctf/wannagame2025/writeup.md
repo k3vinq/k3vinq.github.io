@@ -13,11 +13,30 @@ lang: ''
 Some CTF challenges that I solved during and after the competition.
 
 
+# Web Exploitation
 
+## Trust
+In this challenge, there are two stages we must exploit in order to obtain the flag.
+### Stage 1: TLS Session Reuse in Virtual-Host Environment
+
+Before diving in, let me clarify the concept for your better understanding.
+
+#### TLS Handshake vs. Session Resumption
+When a client connects over HTTPS, it normally performs a full TLS handshake, which includes certificate validation and key exchange.
+To improve performance, TLS allows a client to reuse a previously established session through:
+
+Session IDs (server-side cache)
+Session Tickets (client-side encrypted session state)
+
+If a session is reused, the server skips the full handshake, meaning it also skips steps like client certificate verification.
+
+#### Virtual Hosts With Different Authentication Requirements
+A virtual-host is a configuration that allows a single web server to serve multiple websites or domains on the same IP and port. Each virtual host has its own settings — different domains, routes, certificates, or authentication rules — even though they all run on the same server.
+
+When servers host multiple domains over HTTPS, each virtual host usually defines its own TLS configuration, such as: its own certificate and private key, its own authetication or access rules.
 
 
 # Miscellaneous
-
 ## Pixelated Kisses
 
 ![Challenge](./image/challenge.png)

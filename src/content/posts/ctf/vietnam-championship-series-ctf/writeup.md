@@ -1,15 +1,15 @@
 ---
-title: Vietnam Championship Series CTF
+title: Vietnam Championship Series 2025
 published: 2025-12-20
 description: Some web challs that I solve AFTER the comp
-tags: [web,writeup]
+tags: [ctf,writeup]
 category: Writeup
 draft: false
 ---
 
 
 
-I failed it. But it was fun to try, better next time fosho.
+I failed it, but it was fun to try, better next time fosho.
 
 ## Kiwi
 
@@ -19,7 +19,7 @@ A typical WordPress challenge.
 
 ![](./image/kiwi/chall.png)
 
-When tackling a WordPress challenge, the very first step is to recon some baseline information about the target.
+When tackling a WordPress challenge, the very first step is to gather baseline information about the target.
 
 Inspecting the provided source code shows that a custom plugin named **Kiwiblocks (version 3.5.1)** is installed. As this plugin does not exist in the WordPress plugin directory and has no known CVEs, the intended attack vector is not based on known vulnerabilities but rather on source code analysis.
 
@@ -29,7 +29,7 @@ The website uses the official `Twenty Twenty-Five theme`, which is a public and 
 
 ![](./image/kiwi/themes.png)
 
-Doing some grep to quickly identity some "dangerous" function, endpoints in the source code
+I did some grep to quickly identify some "dangerous" functions and endpoints in the source code
 
 ```bash
 rg "register_rest|wp_ajax" -g "*.php" # entrypoint
@@ -38,11 +38,11 @@ rg "(include|require|file_get_contents|readfile|exec|system|shell_exec)" -g "*.p
 rg "\$_(GET|POST|REQUEST).*?(include|require|file_get_contents|exec)" -g "*.php" # flow
 ```
 
-I found some interesting stuff using this query. There is a path traversal in `src/admin-panel/views/panel.php`.
+I found some interesting stuffs using this query. There is a path traversal in `src/admin-panel/views/panel.php`.
 
 ![](./image/kiwi/rg.png)
 
- It accepts user input which is `$tab` as untrusted data and then directly concatenates it into an `include_once` statement without any validation or sanitization.
+It accepts user input `$tab` as untrusted data and directly concatenates it into an `include_once` statement without any validation or sanitization.
 
 ```php title="src/admin-panel/views/panel.php"
         $tab = isset($_GET['tab']) ? $_GET['tab'] : 'general.php';
@@ -55,7 +55,7 @@ Since the vulnerable file is directly accessible under the plugin directory, the
 
 ![](./image/kiwi/plug.png)
 
-Perform the path traversal stuff with `?tab` and boom
+Perform the path traversal with `?tab` and boom
 
 ![](./image/kiwi/flag.png)
 
@@ -70,7 +70,7 @@ This challenge presents a glass-bridge game inspired by the famous TV series Squ
 ![](./image/squirt_game/first-look.png)
 
 ### Source Audit
-There are 40 sequential steps require to obtain the flag. Each time the game is reset, `reset_game()` reinitializes the session state by setting `current_step` to -1 and generating a new random path consisting of 40 bits using `random_int(0,1)`. This path is stored entirely in the PHP session. Brute-forcing seems almost impossible because of *`PROBABILITY`* (nothing can win it). 
+There are 40 sequential steps required to obtain the flag. Each time the game is reset, `reset_game()` reinitializes the session state by setting `current_step` to -1 and generating a new random path consisting of 40 bits using `random_int(0,1)`. This path is stored entirely in the PHP session. Brute-forcing seems almost impossible due to the extremely low probability of success.
 
 ```php title="index.php"
 function reset_game() {
@@ -114,10 +114,11 @@ First, get a SESSION_ID via `/?act=respawn` with a blank cookie header
 ![](./image/squirt_game/cookie.png)
 
 
-Second , try to leak the map via `jquery-jfeed/proxy.php` using LFI technique with that SESSION_ID. 
+Second, try to leak the map via `jquery-jfeed/proxy.php` using the LFI technique with that SESSION_ID. 
 ![](./image/squirt_game/map.png)
 
-Now we convert that map object to literal string using this script
+Now we convert that map object to a literal string using regex
+
 ```python
 import re
 
@@ -128,7 +129,7 @@ MAP = "".join(bits)
 print(MAP)
 ```
 
-After we got the map, write a small automation script in Python to play the game with the leak map.
+After obtaining the map, write a small Python script to play the game using the leaked map.
 ```python
 import requests
 
@@ -158,7 +159,7 @@ def auto_play():
 if __name__ == "__main__":
     auto_play()
 ```
-And finally we got the flag
+And finally, we got the flag.
 
 ![](./image/squirt_game/flag.png)
 
@@ -172,21 +173,21 @@ And finally we got the flag
 
 ![](./image/pickle_receipt/chall.png)
 
-The challenge presents us with an interface of the recipe manager. We can either submit or view the recipe. Let's go through the functionalities of this application.
+The challenge presents us an interface for a recipe manager. We can either submit or view a recipe. Let's go through the application's functionality.
 
 ![](./image/pickle_receipt/interface.png)
 
 
-We need to input three fields in order to submit recipe
+We need to input three fields to submit a recipe.
 
 ![](./image/pickle_receipt/submit.png)
 
 
-Then it output the encrypted binary data
+Then it outputs the encrypted binary data.
 
 ![](./image/pickle_receipt/encode.png)
 
-Now we can use the previous encrypted binary data to view the recipe at `/view`
+Now we can use the encrypted data to view the recipe at `/view`.
 
 | | |
 |:--:|:--:|
@@ -195,15 +196,15 @@ Now we can use the previous encrypted binary data to view the recipe at `/view`
 
 ### Source Audit
 
-Now let's dive into the source to identify the surface that we can exploit.
+Now let's dive into the source to identify the attack surface we can exploit.
 
-Before we build the container, we must run the provided script that creates a random flag and a random encryption key
+Before building the container, run the provided script that creates a random flag and a random encryption key
 ```sh title="randomize.sh"
 APP_ENCRYPTION_KEY=$(openssl rand -base64 32 | tr '+/' '-_' | tr -d '\n')
 FLAG_VALUE="flag{$(cat /proc/sys/kernel/random/uuid)}"
 ```
 
-There are some important functions in `security.py`. This app using the `Fernet` algorithm which is symmetric encryption to encrypt/decrypt the data. The key is fetched from the environment variable when we running the `randomize.sh` script. The Fernet key must be in bytes. It also blacklist the `file` and `ftp` scheme to mitigate against trivial SSRF/LFI.
+There are some important functions in `security.py`. This app uses the `Fernet` algorithm, which is a symmetric encryption method, to encrypt and decrypt data. The key is fetched from an environment variable when running the `randomize.sh` script. The Fernet key must be in bytes. The code also blacklists the `file` and `ftp` schemes to mitigate trivial SSRF/LFI.
 
 ```python title="security.py" 
 from cryptography.fernet import Fernet
@@ -233,7 +234,7 @@ def is_url_scheme_allowed(url):
 
 ```
 
-In `submit_recipe()` the `/submit` route  handles both `GET` and `POST` method. On `GET` it just render the form. On `POST` it collects three fields, packs them into the dict, serializes that dict with `pickle.dump()`, then encrypts the pickle with `encrypt_data()` (using the `APP_ENCRYPTION_KEY`). The encrypted token is then returned to user.
+In `submit_recipe()`, the `/submit` route handles both `GET` and `POST` methods. On `GET` it just renders the form. On `POST` it collects three fields, packs them into a dict, serializes that dict with `pickle.dumps()`, and then encrypts the pickle with `encrypt_data()` (using the `APP_ENCRYPTION_KEY`). The encrypted token is then returned to the user.
 
 ```python title="app.py"
 @app.route('/submit', methods=['GET', 'POST'])
@@ -253,7 +254,7 @@ def submit_recipe():
     return render_template('submit_recipe.html')
 ```
 
-In `view_recipe()`, the `/view` endpoint handles both `GET` and `POST` method. On `GET`, it serves a form. On `POST`, it accepts either an `encrypted_data` directly or an `url` to fetch it. If an URL is provided, they blocks the `ftp` and `file` scheme, then uses `urlib.request.urlopen` to pull the content. The result is taken as the ciphertext, decode to bytes, and decrypt with the decryption key. The decrypted blob is then passed to `pickle.load()` with no validation, and resulting the object is rendered.
+In `view_recipe()`, the `/view` endpoint handles both `GET` and `POST` methods. On `GET`, it serves a form. On `POST`, it accepts either `encrypted_data` directly or a `url` to fetch it. If a URL is provided, it blocks the `ftp` and `file` schemes, then uses `urllib.request.urlopen` to pull the content. The result is taken as the ciphertext, decoded to bytes, and decrypted with the decryption key. The decrypted blob is then passed to `pickle.loads()` with no validation, and the resulting object is rendered.
 ```python title="app.py"
 def view_recipe():
     if request.method == 'POST':
@@ -285,9 +286,9 @@ def view_recipe():
 
 ### Thinking
 
-We can easily notice some vulnerabilities in those functions. 
+We can easily notice some vulnerabilities in those functions.
 
-First, the blacklist on `is_url_scheme_allowed()` is kinda bad can easily bypass using `url=<space>file`. Base on that, we can read the Fernet key at `/proc/self/environ` which contains all the environment variables for the current process. We can read it by calling an Exception
+First, the blacklist in `is_url_scheme_allowed()` is weak and can be easily bypassed using `url=<space>file`. Based on that, we can read the Fernet key at `/proc/self/environ`, which contains all the environment variables for the current process. We can read it by triggering an exception:
 ```python
     except Exception:
         return f"Error loading recipe. Please check:\n{encrypted_recipe}", 500
@@ -295,16 +296,16 @@ First, the blacklist on `is_url_scheme_allowed()` is kinda bad can easily bypass
 
 ![](./image/pickle_receipt/leak.png)
 
-Second, the serialize/deserialize process has no validation. It accepts user input as the untrusted data and treat it normally. We can exploit this by encrypt the reverse shell payload using the leak key and then serialize it with `pickle.loads()` and then post it on the `/view` endpoint.
+Second, the serialize/deserialize process has no validation. It accepts user input as untrusted data and treats it normally. We can exploit this by encrypting a reverse shell payload using the leaked key, then serializing it and posting it to the `/view` endpoint.
 
 
 
 ### Exploitation
 
-First, we leak the key through the Exception error:
+First, we leak the key through the exception error:
 ![](./image/pickle_receipt/key.png)
 
-Grab `APP_ENCRYPTION_KEY`, then use a small Python script to encrypt a malicious pickle that runs a reverse shell. Because the container is Alpine with few built-in tools, a Python-based reverse shell is the most reliable choice. I also use the `ngrok` to expose my local listener so the shell could reach back out. 
+Grab `APP_ENCRYPTION_KEY`, then use a small Python script to encrypt a malicious pickle that runs a reverse shell. Because the container is Alpine with few built-in tools, a Python-based reverse shell is the most reliable choice. I also used `ngrok` to expose my local listener so the shell could reach back out.
 
 
 ```python title="payload.py"
@@ -331,15 +332,15 @@ Here is the payload in bytes:
 ![](./image/pickle_receipt/payload.png)
 
 
-Submit it in the `encrypted_data` on `/view` endpoint
+Submit it as `encrypted_data` to the `/view` endpoint.
 
 ![](./image/pickle_receipt/connect.png)
 
-Successfully reverse the shell 
+Successfully got a reverse shell.
 
 ![](./image/pickle_receipt/succed_connect.png)
 
-End game
+End game.
 
 ![](./image/pickle_receipt/flag.png)
 
@@ -347,6 +348,9 @@ End game
 
 ## Wrap-Up
 
-I was a bit disappointed that I didn’t perform well in the competition, but I learned a lot from those challenges. Not only technically, but also mentally. Keeping full focus for six hours straight is something I clearly need to improve. Overall, it was a valuable experience, and I’ll come back stronger next time.
+I was a bit disappointed that I didn’t perform well in the competition, but I learned a lot from those challenges — not just technically, but also mentally. Maintaining full focus for six hours straight is something I clearly need to improve. Overall, it was a valuable experience, and I’ll come back stronger next time.
+
+
 Peace out <3
+
 K3vin
