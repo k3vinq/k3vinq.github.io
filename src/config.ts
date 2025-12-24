@@ -55,7 +55,7 @@ export const navBarConfig: NavBarConfig = {
 export const profileConfig: ProfileConfig = {
 	avatar: "assets/images/avatar.jpg", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
 	name: "k3vin",
-	bio: "“To live is to suffer, to survive is to find some meaning in the suffering.” - Friedrich Nietzsche",
+	bio: "“To live is to suffer, to survive is to find some meaning in the suffering.” — Friedrich Nietzsche",
 	links: [
 		{
 			name: "GitHub",
@@ -67,16 +67,16 @@ export const profileConfig: ProfileConfig = {
 			icon: "fa6-brands:linkedin", // icon LinkedIn
 			url: "https://www.linkedin.com/in/k3vinq",
 		},
-		{
-			name: "Facebook",
-			icon: "fa6-brands:facebook",
-			url: "https://www.facebook.com/211qkho1/",
-		},
-		{
-			name: "HackerOne",
-			icon: "simple-icons:hackerone",
-			url: "https://hackerone.com/k3vinq",
-		},
+		//{
+		//	name: "Facebook",
+		//	icon: "fa6-brands:facebook",
+		//	url: "https://www.facebook.com/211qkho1/",
+		//},
+	//	{
+	//		name: "HackerOne",
+	//		icon: "simple-icons:hackerone",
+	//		url: "https://hackerone.com/k3vinq",
+	//	},
 	],
 };
 
